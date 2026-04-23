@@ -1,5 +1,14 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 
-// https://astro.build/config
-export default defineConfig({});
+export default defineConfig({
+  output: 'static',
+  site: 'https://cdh.cgiar.org',
+  vite: {
+    build: {
+      rollupOptions: {
+        external: [/\/pagefind\//],
+      },
+    },
+  },
+});

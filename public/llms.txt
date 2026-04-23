@@ -1,0 +1,36 @@
+# CGIAR Climate Data Hub
+
+> A curated catalog of climate and agroclimatic datasets for smallholder agriculture research, maintained by CGIAR. Datasets are described using the STAC (SpatioTemporal Asset Catalog) specification with a custom CDH extension for agricultural metadata.
+
+## Catalog
+
+- [Data Catalog](/catalog): Browse all STAC datasets. Supports keyword and spatial bounding-box filtering.
+- [CHIRPS Daily Rainfall v2.0](/catalog/chirps-rainfall): Daily rainfall estimates at 0.05° resolution, 1981–present, 50°S–50°N. Combines satellite infrared data with station measurements.
+- [ERA5 Monthly 2m Air Temperature](/catalog/era5-temperature): ECMWF ERA5 reanalysis monthly temperature at 0.25° resolution, global, 1940–present.
+- [East Africa Growing Season Agroclimatic Index v1.0](/catalog/ea-agroclimatic-index): Derived agroclimatic suitability dataset for East Africa combining CHIRPS and ERA5. Covers growing season length, water deficit, heat stress, and season onset for key smallholder commodities (maize, sorghum, beans, millet, soybean, cassava), 1981–2023.
+
+## Tutorials
+
+- [Getting Started with the Climate Data Hub](/tutorials/getting-started): Navigate the CDH, find datasets, and download climate data.
+- [Working with STAC Catalogs](/tutorials/working-with-stac): Understand the STAC specification and how CDH uses it to describe datasets.
+
+## Wiki
+
+- [Data Formats Reference](/wiki/data-formats): Reference guide to file formats used in CDH datasets (GeoTIFF/COG, NetCDF, CSV, CRS).
+- [Glossary](/wiki/glossary): Definitions of key terms — STAC, bbox, COG, CRS, temporal extent, and more.
+
+## Licensing
+
+Each dataset carries a top-level STAC `license` field using SPDX identifiers (e.g. `CC-BY-4.0`, `CC0-1.0`, `proprietary`). License information is shown on each dataset detail page with a link to the full license text where applicable.
+
+## CDH STAC Extension
+
+CDH datasets may carry a `cdh:` extension namespace in their STAC properties with the following fields:
+
+- `cdh:commodities` — array of crop commodities the dataset is relevant to
+- `cdh:variable_summary` — array of objects describing each variable: `name`, `definition`, `unit`, `interpretation`
+- `cdh:spatial_resolution` — object with `value` and `unit` (e.g. 0.05 degrees)
+- `cdh:temporal_resolution` — object with `value` and `unit` (e.g. 1 year)
+- `cdh:usecases` — array of plain-language use case descriptions
+
+Extension schema: https://github.com/cgiar-csi/stac-cdh-extension/blob/v1.0.0/schema.json

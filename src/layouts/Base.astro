@@ -1,0 +1,193 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'CGIAR Climate Data Hub' } = Astro.props;
+
+const navLinks = [
+  { href: '/catalog', label: 'Catalog' },
+  { href: '/tutorials', label: 'Tutorials' },
+  { href: '/wiki', label: 'Wiki' },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <title>{title} | CDH</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Main navigation">
+        <a href="/" class="nav-brand">CGIAR Climate Data Hub</a>
+
+        <div class="nav-divider" aria-hidden="true"></div>
+
+        <ul id="nav-menu" class="nav-links" role="list">
+          {navLinks.map(link => (
+            <li>
+              <a
+                href={link.href}
+                class:list={['nav-link', { 'nav-link--active': currentPath.startsWith(link.href) }]}
+              >
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        <div class="nav-search">
+          <button id="search-toggle" class="nav-search-btn" aria-label="Open search">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+            Search
+          </button>
+        </div>
+
+        <button
+          class="nav-hamburger"
+          aria-label="Toggle menu"
+          aria-expanded="false"
+          aria-controls="nav-menu"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </nav>
+    </header>
+
+    <div id="search-modal" class="search-modal" hidden>
+      <div class="search-modal-inner">
+        <button id="search-close" class="search-close" aria-label="Close search">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          Close
+        </button>
+        <input
+          id="search-input"
+          class="search-input"
+          type="search"
+          placeholder="Search datasets, tutorials, wiki…"
+          autocomplete="off"
+          aria-label="Search"
+        />
+        <ul id="search-results" class="search-results" role="list"></ul>
+        <p id="search-status" class="search-status"></p>
+      </div>
+    </div>
+
+    <main id="main-content" class="main-content">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <span class="footer-brand">CGIAR Climate Data Hub</span>
+        <span class="footer-meta">&copy; {new Date().getFullYear()} CGIAR — Prototype</span>
+      </div>
+    </footer>
+
+    <script>
+      const hamburger = document.querySelector<HTMLButtonElement>('.nav-hamburger');
+      const navMenu = document.getElementById('nav-menu');
+
+      hamburger?.addEventListener('click', () => {
+        const isOpen = hamburger.getAttribute('aria-expanded') === 'true';
+        hamburger.setAttribute('aria-expanded', String(!isOpen));
+        navMenu?.classList.toggle('nav-links--open');
+      });
+
+      const searchToggle = document.getElementById('search-toggle');
+      const searchClose = document.getElementById('search-close');
+      const searchModal = document.getElementById('search-modal');
+      const searchInput = document.getElementById('search-input') as HTMLInputElement | null;
+      const searchResults = document.getElementById('search-results');
+      const searchStatus = document.getElementById('search-status');
+
+      let pagefind: any = null;
+
+      async function loadPagefind() {
+        if (pagefind) return;
+        try {
+          // @ts-ignore
+          pagefind = await import('/pagefind/pagefind.js');
+          await pagefind.init();
+        } catch {
+          // dev mode — no index
+        }
+      }
+
+      async function runSearch(query: string) {
+        if (!searchResults || !searchStatus) return;
+        if (!query.trim()) {
+          searchResults.innerHTML = '';
+          searchStatus.textContent = '';
+          return;
+        }
+        if (!pagefind) {
+          searchStatus.textContent = 'Search unavailable — run bun run build first.';
+          return;
+        }
+
+        const search = await pagefind.search(query);
+        const top = search.results.slice(0, 8);
+        const data = await Promise.all(top.map((r: any) => r.data()));
+
+        if (data.length === 0) {
+          searchResults.innerHTML = '';
+          searchStatus.textContent = `No results for "${query}"`;
+          return;
+        }
+
+        searchStatus.textContent = `${search.results.length} result${search.results.length !== 1 ? 's' : ''}`;
+        searchResults.innerHTML = data.map((item: any) => `
+          <li class="search-result-item">
+            <a href="${item.url}"><strong>${item.meta?.title ?? item.url}</strong></a>
+            <p>${item.excerpt}</p>
+          </li>
+        `).join('');
+      }
+
+      searchInput?.addEventListener('input', () => runSearch(searchInput.value));
+
+      async function openSearch() {
+        searchModal?.removeAttribute('hidden');
+        await loadPagefind();
+        searchInput?.focus();
+      }
+
+      searchToggle?.addEventListener('click', openSearch);
+
+      searchClose?.addEventListener('click', () => {
+        searchModal?.setAttribute('hidden', '');
+      });
+
+      searchModal?.addEventListener('click', (e) => {
+        if (e.target === searchModal) searchModal.setAttribute('hidden', '');
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') searchModal?.setAttribute('hidden', '');
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+          e.preventDefault();
+          openSearch();
+        }
+      });
+    </script>
+  </body>
+</html>

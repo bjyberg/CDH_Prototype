@@ -1,0 +1,38 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+const all = await getCollection('tutorials', ({ data }) => !data.draft);
+const tutorials = all.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<Base title="Tutorials" description="Step-by-step guides for working with CGIAR climate data.">
+  <div class="page-header">
+    <p class="page-overline">Guides</p>
+    <h1>Tutorials</h1>
+    <p>{tutorials.length} step-by-step guide{tutorials.length !== 1 ? 's' : ''}</p>
+  </div>
+
+  <ul class="content-list" role="list">
+    {tutorials.map(t => (
+      <li class="content-item">
+        <a href={`/tutorials/${t.id}`}>
+          <h2>{t.data.title}</h2>
+        </a>
+        <p>{t.data.description}</p>
+        <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap; margin-top:0.5rem;">
+          <span class="item-meta">
+            <time datetime={t.data.pubDate.toISOString()}>
+              {t.data.pubDate.toLocaleDateString('en-GB', { dateStyle: 'medium' })}
+            </time>
+          </span>
+          {t.data.tags.length > 0 && (
+            <ul class="tag-list" role="list">
+              {t.data.tags.map((tag: string) => <li class="tag">{tag}</li>)}
+            </ul>
+          )}
+        </div>
+      </li>
+    ))}
+  </ul>
+</Base>

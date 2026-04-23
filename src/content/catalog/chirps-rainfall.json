@@ -1,0 +1,45 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "id": "chirps-v2-daily",
+  "license": "CC0-1.0",
+  "title": "CHIRPS Daily Rainfall v2.0",
+  "description": "Climate Hazards Group InfraRed Precipitation with Station data (CHIRPS) provides daily rainfall estimates at 0.05° resolution for 1981–present, covering 50°S–50°N. Combines satellite thermal infrared data with ground station measurements.",
+  "keywords": ["rainfall", "precipitation", "daily", "CHIRPS", "climate", "agriculture"],
+  "bbox": [-180, -50, 180, 50],
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [[[-180, -50], [180, -50], [180, 50], [-180, 50], [-180, -50]]]
+  },
+  "properties": {
+    "datetime": null,
+    "start_datetime": "1981-01-01",
+    "end_datetime": "2023-12-31"
+  },
+  "links": [
+    {
+      "rel": "self",
+      "href": "/catalog/chirps-v2-daily",
+      "type": "application/json"
+    },
+    {
+      "rel": "source",
+      "href": "https://www.chc.ucsb.edu/data/chirps",
+      "title": "CHIRPS Homepage — UC Santa Barbara"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "https://data.chc.ucsb.edu/products/CHIRPS-2.0/global_daily/tifs/p05/",
+      "title": "Daily GeoTIFF files",
+      "type": "image/tiff; application=geotiff",
+      "roles": ["data"]
+    },
+    "documentation": {
+      "href": "https://www.chc.ucsb.edu/data/chirps/CHIRPSdocumentation.pdf",
+      "title": "Technical Documentation (PDF)",
+      "type": "application/pdf",
+      "roles": ["metadata"]
+    }
+  }
+}

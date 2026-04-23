@@ -1,17 +1,71 @@
 ---
+import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
 
+const catalogCount = (await getCollection('catalog')).length;
+const tutorialCount = (await getCollection('tutorials', ({ data }) => !data.draft)).length;
+const wikiCount = (await getCollection('wiki')).length;
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Base title="Home" description="CGIAR Climate Data Hub — access climate datasets, tutorials, and documentation.">
+  <section class="hero">
+    <p class="hero-overline">CGIAR Climate Data Hub</p>
+    <h1>Climate data for<br /><span>informed action</span></h1>
+    <p class="hero-subtitle">
+      Access curated climate and geospatial datasets, learn through step-by-step tutorials,
+      and explore reference documentation built for agricultural researchers.
+    </p>
+    <div class="hero-actions">
+      <a href="/catalog" class="btn-primary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+        </svg>
+        Browse Catalog
+      </a>
+      <a href="/tutorials" class="btn-secondary">View Tutorials</a>
+    </div>
+  </section>
+
+  <nav class="section-cards" aria-label="Site sections">
+    <a href="/catalog" class="section-card">
+      <div class="section-card-icon" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+        </svg>
+      </div>
+      <p class="section-card-overline">Datasets</p>
+      <h2>Catalog</h2>
+      <p>Browse {catalogCount} climate datasets in STAC format — with metadata, spatial extents, temporal coverage, and asset links.</p>
+      <span class="section-card-arrow">Browse datasets →</span>
+    </a>
+
+    <a href="/tutorials" class="section-card">
+      <div class="section-card-icon" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+        </svg>
+      </div>
+      <p class="section-card-overline">Guides</p>
+      <h2>Tutorials</h2>
+      <p>{tutorialCount} step-by-step guides for finding, downloading, and working with climate data using Python and standard GIS tools.</p>
+      <span class="section-card-arrow">Start learning →</span>
+    </a>
+
+    <a href="/wiki" class="section-card">
+      <div class="section-card-icon" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/>
+        </svg>
+      </div>
+      <p class="section-card-overline">Reference</p>
+      <h2>Wiki</h2>
+      <p>{wikiCount} reference pages covering data formats, glossaries, coordinate systems, and technical standards used across CDH.</p>
+      <span class="section-card-arrow">Explore docs →</span>
+    </a>
+  </nav>
+</Base>

@@ -1,0 +1,31 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+const pages = await getCollection('wiki');
+pages.sort((a, b) => a.data.title.localeCompare(b.data.title));
+---
+
+<Base title="Wiki" description="Reference documentation, glossaries, and technical guides.">
+  <div class="page-header">
+    <p class="page-overline">Reference</p>
+    <h1>Wiki</h1>
+    <p>{pages.length} reference page{pages.length !== 1 ? 's' : ''}</p>
+  </div>
+
+  <ul class="content-list" role="list">
+    {pages.map(page => (
+      <li class="content-item">
+        <a href={`/wiki/${page.id}`}>
+          <h2>{page.data.title}</h2>
+        </a>
+        <p>{page.data.description}</p>
+        {page.data.tags.length > 0 && (
+          <ul class="tag-list" role="list" style="margin-top:0.5rem;">
+            {page.data.tags.map((tag: string) => <li class="tag">{tag}</li>)}
+          </ul>
+        )}
+      </li>
+    ))}
+  </ul>
+</Base>

@@ -1,0 +1,389 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import 'leaflet/dist/leaflet.css';
+
+const items = await getCollection('catalog');
+items.sort((a, b) => a.data.title.localeCompare(b.data.title));
+---
+
+<Base title="Catalog" description="Browse the CGIAR climate data catalog.">
+  <div class="page-header">
+    <p class="page-overline">Datasets</p>
+    <h1>Data Catalog</h1>
+    <p>Curated climate datasets in STAC format.</p>
+  </div>
+
+  <div class="catalog-toolbar">
+    <span id="catalog-count" class="catalog-count">
+      {items.length} dataset{items.length !== 1 ? 's' : ''}
+    </span>
+    <input
+      id="catalog-search"
+      class="filter-input"
+      type="search"
+      placeholder="Filter by keyword…"
+      autocomplete="off"
+      aria-label="Filter catalog"
+    />
+  </div>
+
+  <!-- Spatial filter -->
+  <div class="spatial-filter">
+    <button id="spatial-toggle" class="spatial-toggle" aria-expanded="false" aria-controls="spatial-body">
+      <span class="spatial-toggle-left">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+        </svg>
+        Spatial Filter
+      </span>
+      <span class="spatial-toggle-right">
+        <span id="bbox-status" class="bbox-pill" hidden></span>
+        <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </span>
+    </button>
+
+    <div id="spatial-body" class="spatial-body" hidden>
+      <div class="spatial-map-bar">
+        <button id="draw-btn" class="btn-draw">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+          </svg>
+          Draw area
+        </button>
+        <button id="clear-bbox-btn" class="btn-draw btn-draw--clear" hidden>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+            <path d="M18 6 6 18M6 6l12 12"/>
+          </svg>
+          Clear filter
+        </button>
+        <span id="map-hint" class="map-hint">Click and drag to draw a bounding box.</span>
+      </div>
+      <div id="catalog-map" class="catalog-map"></div>
+    </div>
+  </div>
+
+  <div id="catalog-grid" class="catalog-grid">
+    {items.map(item => (
+      <a
+        href={`/catalog/${item.id}`}
+        class="catalog-card"
+        data-search-text={[item.data.title, item.data.description, ...item.data.keywords].join(' ').toLowerCase()}
+        data-bbox={JSON.stringify(item.data.bbox)}
+        data-pagefind-body
+      >
+        <div class="catalog-card-body">
+          <h2 class="catalog-card-title">{item.data.title}</h2>
+          <p class="catalog-card-desc">{item.data.description}</p>
+        </div>
+        <div class="catalog-card-footer">
+          {item.data.keywords.length > 0 && (
+            <ul class="tag-list" role="list">
+              {item.data.keywords.slice(0, 3).map((kw: string) => (
+                <li class="tag">{kw}</li>
+              ))}
+            </ul>
+          )}
+          <p class="catalog-bbox">bbox: [{item.data.bbox.join(', ')}]</p>
+        </div>
+      </a>
+    ))}
+  </div>
+
+  <p id="catalog-empty" class="catalog-empty" hidden>No datasets match your filters.</p>
+</Base>
+
+<style>
+  /* Spatial filter container */
+  .spatial-filter {
+    margin-bottom: 1.5rem;
+    background: var(--surface-lowest);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  /* Collapse toggle button */
+  .spatial-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1rem;
+    background: var(--surface-low);
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: background 0.15s;
+  }
+
+  .spatial-toggle:hover { background: var(--surface-container); }
+
+  .spatial-toggle-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--primary-container);
+  }
+
+  .spatial-toggle-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .chevron {
+    color: var(--outline);
+    transition: transform 0.2s ease;
+  }
+
+  .spatial-toggle[aria-expanded="true"] .chevron {
+    transform: rotate(180deg);
+  }
+
+  /* Bbox pill shown in header when filter is active */
+  .bbox-pill {
+    font-size: 0.7rem;
+    font-family: var(--font-mono);
+    background: var(--primary);
+    color: var(--on-primary);
+    padding: 0.15rem 0.5rem;
+    border-radius: var(--radius);
+  }
+
+  /* Map body */
+  .spatial-body { border-top: 1px solid var(--surface-high); }
+
+  .spatial-map-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1rem;
+    background: var(--surface-lowest);
+    flex-wrap: wrap;
+  }
+
+  .catalog-map {
+    height: 260px;
+    width: 100%;
+  }
+
+  .map-hint {
+    font-size: 0.775rem;
+    color: var(--outline);
+    margin-left: auto;
+    display: none;
+  }
+
+  .map-hint.visible { display: block; }
+
+  /* Draw buttons */
+  .btn-draw {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: var(--font-body);
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--radius);
+    border: none;
+    cursor: pointer;
+    background: var(--secondary-container);
+    color: var(--on-secondary-container);
+    transition: background 0.15s;
+  }
+
+  .btn-draw:hover { background: var(--surface-dim); }
+
+  .btn-draw--active {
+    background: var(--primary);
+    color: var(--on-primary);
+  }
+
+  .btn-draw--active:hover { opacity: 0.88; }
+
+  .btn-draw--clear {
+    background: var(--surface-container);
+    color: var(--on-surface-muted);
+  }
+</style>
+
+<script>
+  import L from 'leaflet';
+
+  const searchInput = document.getElementById('catalog-search') as HTMLInputElement | null;
+  const grid = document.getElementById('catalog-grid');
+  const countEl = document.getElementById('catalog-count');
+  const emptyEl = document.getElementById('catalog-empty');
+  const bboxStatus = document.getElementById('bbox-status') as HTMLElement | null;
+  const drawBtn = document.getElementById('draw-btn') as HTMLButtonElement | null;
+  const clearBtn = document.getElementById('clear-bbox-btn') as HTMLButtonElement | null;
+  const mapHint = document.getElementById('map-hint');
+  const spatialToggle = document.getElementById('spatial-toggle') as HTMLButtonElement | null;
+  const spatialBody = document.getElementById('spatial-body');
+
+  const cards = Array.from(grid?.querySelectorAll<HTMLElement>('[data-search-text]') ?? []);
+
+  let textQuery = '';
+  let bboxFilter: [number, number, number, number] | null = null;
+  let mapInitialized = false;
+  let leafletMap: L.Map | null = null;
+
+  // ── Filters ─────────────────────────────────────────────────
+  function bboxOverlaps(item: number[], filter: number[]) {
+    const [iW, iS, iE, iN] = item;
+    const [fW, fS, fE, fN] = filter;
+    return !(iE < fW || fE < iW || iN < fS || fN < iS);
+  }
+
+  function applyFilters() {
+    let visible = 0;
+    cards.forEach(card => {
+      const matchesText = !textQuery || card.dataset.searchText?.includes(textQuery);
+      const matchesBbox = !bboxFilter || !card.dataset.bbox
+        ? true
+        : bboxOverlaps(JSON.parse(card.dataset.bbox), bboxFilter);
+      const show = matchesText && matchesBbox;
+      card.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+
+    const total = cards.length;
+    if (countEl) {
+      countEl.textContent = (textQuery || bboxFilter)
+        ? `${visible} of ${total} datasets`
+        : `${total} dataset${total !== 1 ? 's' : ''}`;
+    }
+
+    if (bboxStatus) {
+      if (bboxFilter) {
+        const [w, s, e, n] = bboxFilter.map(v => v.toFixed(1));
+        bboxStatus.textContent = `[${w}, ${s}, ${e}, ${n}]`;
+        bboxStatus.removeAttribute('hidden');
+      } else {
+        bboxStatus.setAttribute('hidden', '');
+      }
+    }
+
+    emptyEl?.toggleAttribute('hidden', visible > 0);
+  }
+
+  searchInput?.addEventListener('input', () => {
+    textQuery = searchInput.value.toLowerCase().trim();
+    applyFilters();
+  });
+
+  // ── Collapse toggle ─────────────────────────────────────────
+  spatialToggle?.addEventListener('click', () => {
+    const isOpen = spatialToggle.getAttribute('aria-expanded') === 'true';
+    spatialToggle.setAttribute('aria-expanded', String(!isOpen));
+    spatialBody?.toggleAttribute('hidden', isOpen);
+
+    if (!isOpen && !mapInitialized) {
+      // Lazy-init map on first open
+      initMap();
+    } else if (!isOpen && leafletMap) {
+      // Fix tile rendering after becoming visible
+      setTimeout(() => leafletMap?.invalidateSize(), 50);
+    }
+  });
+
+  // ── Leaflet map ─────────────────────────────────────────────
+  function initMap() {
+    mapInitialized = true;
+
+    leafletMap = L.map('catalog-map', {
+      center: [20, 10],
+      zoom: 1,
+      zoomControl: true,
+      attributionControl: true,
+    });
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 19,
+    }).addTo(leafletMap);
+
+    // ── Draw interaction ──────────────────────────────────────
+    let drawMode = false;
+    let drawing = false;
+    let startLatLng: L.LatLng | null = null;
+    let filterRect: L.Rectangle | null = null;
+
+    function setDrawMode(active: boolean) {
+      drawMode = active;
+      leafletMap!.getContainer().style.cursor = active ? 'crosshair' : '';
+      if (drawBtn) {
+        drawBtn.innerHTML = active
+          ? `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg> Cancel`
+          : `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg> Draw area`;
+        drawBtn.classList.toggle('btn-draw--active', active);
+      }
+      if (mapHint) mapHint.classList.toggle('visible', active);
+    }
+
+    drawBtn?.addEventListener('click', () => setDrawMode(!drawMode));
+
+    clearBtn?.addEventListener('click', () => {
+      filterRect?.remove();
+      filterRect = null;
+      bboxFilter = null;
+      clearBtn.setAttribute('hidden', '');
+      setDrawMode(false);
+      applyFilters();
+    });
+
+    leafletMap.on('mousedown', (e) => {
+      if (!drawMode) return;
+      drawing = true;
+      startLatLng = e.latlng;
+      filterRect?.remove();
+      filterRect = null;
+      leafletMap!.dragging.disable();
+    });
+
+    leafletMap.on('mousemove', (e) => {
+      if (!drawing || !startLatLng) return;
+      const bounds = L.latLngBounds(startLatLng, e.latlng);
+      if (filterRect) {
+        filterRect.setBounds(bounds);
+      } else {
+        filterRect = L.rectangle(bounds, {
+          color: '#003336',
+          weight: 2,
+          fillColor: '#004b50',
+          fillOpacity: 0.15,
+        }).addTo(leafletMap!);
+      }
+    });
+
+    leafletMap.on('mouseup', (e) => {
+      if (!drawing) return;
+      drawing = false;
+      leafletMap!.dragging.enable();
+
+      const bounds = filterRect?.getBounds();
+      if (bounds?.isValid()) {
+        const w = bounds.getWest(), s = bounds.getSouth();
+        const east = bounds.getEast(), n = bounds.getNorth();
+        if (Math.abs(east - w) > 0.5 || Math.abs(n - s) > 0.5) {
+          bboxFilter = [w, s, east, n];
+          clearBtn?.removeAttribute('hidden');
+          setDrawMode(false);
+          applyFilters();
+          return;
+        }
+      }
+      filterRect?.remove();
+      filterRect = null;
+      setDrawMode(false);
+    });
+  }
+</script>

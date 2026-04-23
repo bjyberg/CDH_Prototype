@@ -1,0 +1,416 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+export async function getStaticPaths() {
+  const items = await getCollection('catalog');
+  return items.map(item => ({
+    params: { id: item.id },
+    props: { item, allItems: items },
+  }));
+}
+
+interface Props {
+  item: CollectionEntry<'catalog'>;
+  allItems: CollectionEntry<'catalog'>[];
+}
+
+const { item, allItems } = Astro.props;
+
+// Map STAC id → Astro file slug for resolving derived_from hrefs
+const stacIdToSlug = Object.fromEntries(
+  allItems.map(i => [i.data.id, i.id])
+);
+const { title, description, keywords, bbox, properties, assets, links, stac_extensions, license } = item.data;
+
+const licenseDisplay: Record<string, { label: string; url?: string }> = {
+  'CC0-1.0':       { label: 'CC0 1.0 Public Domain', url: 'https://creativecommons.org/publicdomain/zero/1.0/' },
+  'CC-BY-4.0':     { label: 'CC BY 4.0', url: 'https://creativecommons.org/licenses/by/4.0/' },
+  'CC-BY-SA-4.0':  { label: 'CC BY-SA 4.0', url: 'https://creativecommons.org/licenses/by-sa/4.0/' },
+  'CC-BY-NC-4.0':  { label: 'CC BY-NC 4.0', url: 'https://creativecommons.org/licenses/by-nc/4.0/' },
+  'proprietary':   { label: 'Proprietary' },
+  'various':       { label: 'Various' },
+};
+const licenseInfo = license ? (licenseDisplay[license] ?? { label: license }) : null;
+
+const assetEntries = Object.entries(assets ?? {});
+const derivedFrom = (links ?? []).filter(l => l.rel === 'derived_from');
+const codeLinks   = (links ?? []).filter(l => l.rel === 'code');
+const otherLinks  = (links ?? []).filter(l => !['self', 'derived_from', 'code', 'extension'].includes(l.rel));
+
+const commodities        = properties['cdh:commodities'];
+const spatialResolution  = properties['cdh:spatial_resolution'];
+const temporalResolution = properties['cdh:temporal_resolution'];
+const variableSummary    = properties['cdh:variable_summary'];
+const usecases           = properties['cdh:usecases'];
+const isCdhExtended      = stac_extensions?.some(e => e.includes('stac-cdh-extension')) ?? false;
+---
+
+<Base title={title} description={description}>
+  <div data-pagefind-body>
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="/catalog">Catalog</a>
+      <span class="breadcrumb-sep" aria-hidden="true">›</span>
+      <span>{title}</span>
+    </nav>
+
+    <div class="dataset-hero">
+      <div class="dataset-hero-badges">
+        <p class="page-overline">STAC Dataset</p>
+        {isCdhExtended && (
+          <span class="cdh-badge">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            CDH Extension
+          </span>
+        )}
+        {derivedFrom.length > 0 && (
+          <span class="derived-badge">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+            </svg>
+            Derived Product
+          </span>
+        )}
+      </div>
+
+      <h1>{title}</h1>
+      <p class="dataset-id">ID: {item.data.id} &middot; STAC {item.data.stac_version}</p>
+      <p class="dataset-description">{description}</p>
+
+      {keywords.length > 0 && (
+        <ul class="tag-list" role="list" style="margin-top: 1rem;">
+          {keywords.map((kw: string) => <li class="tag">{kw}</li>)}
+        </ul>
+      )}
+    </div>
+
+    <!-- Core metadata grid -->
+    <div class="dataset-grid">
+      <div class="dataset-cell">
+        <p class="dataset-cell-label">Temporal Coverage</p>
+        {properties.datetime
+          ? <p>{properties.datetime}</p>
+          : <p>{properties.start_datetime ?? '—'} &ndash; {properties.end_datetime ?? 'present'}</p>
+        }
+      </div>
+      <div class="dataset-cell">
+        <p class="dataset-cell-label">Spatial Extent (W, S, E, N)</p>
+        <code>[{bbox.join(', ')}]</code>
+      </div>
+      {spatialResolution && (
+        <div class="dataset-cell">
+          <p class="dataset-cell-label cdh-label">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Spatial Resolution
+          </p>
+          <p>{spatialResolution.value} {spatialResolution.unit}</p>
+        </div>
+      )}
+      {temporalResolution && (
+        <div class="dataset-cell">
+          <p class="dataset-cell-label cdh-label">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Temporal Resolution
+          </p>
+          <p>{temporalResolution.value} {temporalResolution.unit}{temporalResolution.value !== 1 ? 's' : ''}</p>
+        </div>
+      )}
+      {licenseInfo && (
+        <div class="dataset-cell">
+          <p class="dataset-cell-label">License</p>
+          {licenseInfo.url
+            ? <a class="license-link" href={licenseInfo.url} target="_blank" rel="noopener noreferrer">{licenseInfo.label}</a>
+            : <p>{licenseInfo.label}</p>
+          }
+        </div>
+      )}
+    </div>
+
+    <!-- CDH Extension: Commodities -->
+    {commodities && commodities.length > 0 && (
+      <div class="dataset-section">
+        <p class="dataset-section-label cdh-label">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          Commodities
+        </p>
+        <ul class="tag-list" role="list">
+          {commodities.map((c: string) => <li class="tag tag--commodity">{c}</li>)}
+        </ul>
+      </div>
+    )}
+
+    <!-- CDH Extension: Variable Summary -->
+    {variableSummary && variableSummary.length > 0 && (
+      <div class="dataset-section">
+        <p class="dataset-section-label cdh-label">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          Variables
+        </p>
+        <div class="variable-grid">
+          {variableSummary.map((v: { name: string; definition: string; unit: string; interpretation: string }) => (
+            <div class="variable-card">
+              <div class="variable-header">
+                <code class="variable-name">{v.name}</code>
+                <span class="variable-unit">{v.unit}</span>
+              </div>
+              <p class="variable-definition">{v.definition}</p>
+              <p class="variable-interpretation">{v.interpretation}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+
+    <!-- CDH Extension: Use Cases -->
+    {usecases && usecases.length > 0 && (
+      <div class="dataset-section">
+        <p class="dataset-section-label cdh-label">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          Use Cases
+        </p>
+        <ul class="usecase-list">
+          {usecases.map((u: string) => (
+            <li class="usecase-item">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
+              {u}
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    <!-- Assets -->
+    {assetEntries.length > 0 && (
+      <div class="dataset-section">
+        <p class="dataset-section-label">Assets</p>
+        <ul class="asset-list">
+          {assetEntries.map(([key, asset]) => (
+            <li class="asset-item">
+              <a href={asset.href} target="_blank" rel="noopener noreferrer">
+                {asset.title ?? key}
+              </a>
+              {asset.type && <span class="asset-type">{asset.type}</span>}
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    <!-- Derived From -->
+    {derivedFrom.length > 0 && (
+      <div class="dataset-section">
+        <p class="dataset-section-label">Derived From</p>
+        <ul class="asset-list">
+          {derivedFrom.map(link => {
+            const stacId = link.href.split('/').pop() ?? '';
+            const slug = stacIdToSlug[stacId];
+            const resolvedHref = slug ? `/catalog/${slug}` : link.href;
+            return (
+              <li class="asset-item asset-item--derived">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                  <polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                </svg>
+                <a href={resolvedHref}>{link.title ?? link.href}</a>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    )}
+
+    <!-- Code -->
+    {codeLinks.length > 0 && (
+      <div class="dataset-section">
+        <p class="dataset-section-label">Processing Code</p>
+        <ul class="asset-list">
+          {codeLinks.map(link => (
+            <li class="asset-item asset-item--code">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+              </svg>
+              <a href={link.href} target="_blank" rel="noopener noreferrer">{link.title ?? link.href}</a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    <!-- Other links -->
+    {otherLinks.length > 0 && (
+      <div class="dataset-section">
+        <p class="dataset-section-label">External Links</p>
+        <ul class="asset-list">
+          {otherLinks.map(link => (
+            <li class="asset-item">
+              <a href={link.href} target="_blank" rel="noopener noreferrer">
+                {link.title ?? link.rel}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+  </div>
+</Base>
+
+<style>
+  /* Badges */
+  .dataset-hero-badges {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+  }
+
+  .cdh-badge, .derived-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.2rem 0.55rem;
+    border-radius: var(--radius);
+  }
+
+  .cdh-badge {
+    background: var(--primary);
+    color: var(--on-primary);
+  }
+
+  .derived-badge {
+    background: var(--secondary-container);
+    color: var(--on-secondary-container);
+  }
+
+  /* CDH extension labels */
+  .cdh-label {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .cell-subtext {
+    font-size: 0.775rem;
+    color: var(--outline);
+    margin-top: 0.2rem;
+    line-height: 1.4;
+  }
+
+  /* License link */
+  .license-link {
+    font-size: 0.875rem;
+    color: var(--primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  /* Commodity tags */
+  .tag--commodity {
+    background: rgba(0, 51, 54, 0.08);
+    color: var(--primary);
+    font-weight: 500;
+  }
+
+  /* Variable grid */
+  .variable-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1px;
+    background: var(--surface-high);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .variable-card {
+    background: var(--surface-lowest);
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .variable-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .variable-name {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--primary);
+    background: rgba(0, 51, 54, 0.07);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+
+  .variable-unit {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--outline);
+    white-space: nowrap;
+  }
+
+  .variable-definition {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--on-background);
+  }
+
+  .variable-interpretation {
+    font-size: 0.8rem;
+    color: var(--on-surface-muted);
+    line-height: 1.55;
+  }
+
+  /* Use cases */
+  .usecase-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .usecase-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    font-size: 0.9rem;
+    color: var(--on-background);
+    padding: 0.75rem 1rem;
+    background: var(--surface-low);
+    border-radius: var(--radius);
+  }
+
+  .usecase-item svg {
+    color: var(--primary);
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+  }
+
+  /* Derived / code asset items */
+  .asset-item--derived a, .asset-item--code a {
+    color: var(--primary);
+  }
+
+  .asset-item--derived, .asset-item--code {
+    gap: 0.6rem;
+  }
+
+  .asset-item--derived svg { color: var(--secondary); }
+  .asset-item--code svg { color: var(--primary-container); }
+</style>
