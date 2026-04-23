@@ -60,7 +60,10 @@
 }
 
 /* ===== Base ===== */
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+  height: 100%;
+}
 
 body {
   font-family: var(--font-body);
@@ -68,6 +71,9 @@ body {
   background: var(--surface);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ===== Navigation ===== */
@@ -213,6 +219,7 @@ body {
 
 /* ===== Main ===== */
 .main-content {
+  flex: 1;
   max-width: var(--max-width);
   margin: 0 auto;
   padding: 0 1.5rem 4rem;
