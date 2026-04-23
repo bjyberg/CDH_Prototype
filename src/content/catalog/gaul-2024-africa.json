@@ -1,6 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://github.com/cgiar-csi/stac-cdh-extension/blob/v1.0.0/schema.json"
+  ],
   "id": "gaul-2024-africa",
   "license": "proprietary",
   "title": "GAUL 2024 Administrative Boundaries — Africa",
@@ -14,7 +17,39 @@
   "properties": {
     "datetime": null,
     "start_datetime": "2024-01-01",
-    "end_datetime": "2024-12-31"
+    "end_datetime": "2024-12-31",
+    "cdh:temporal_resolution": {
+      "value": 1,
+      "unit": "year",
+      "description": "Annual release; boundaries represent administrative divisions as of 2024"
+    },
+    "cdh:variable_summary": [
+      {
+        "name": "admin0",
+        "definition": "Country Boundaries",
+        "unit": "polygon",
+        "interpretation": "National administrative boundaries for 54 African Union member states. Each feature includes ISO 3166-1 alpha-2 and alpha-3 country codes, GAUL country code, and official country name. Suitable for continental-scale analysis and national-level reporting."
+      },
+      {
+        "name": "admin1",
+        "definition": "Province / State Boundaries",
+        "unit": "polygon",
+        "interpretation": "First-level administrative subdivisions (provinces, states, regions, governorates depending on country). Each feature includes the admin1 name, GAUL admin1 code, and parent country identifier. Typical use: sub-national food security reporting and climate indicator aggregation."
+      },
+      {
+        "name": "admin2",
+        "definition": "District / County Boundaries",
+        "unit": "polygon",
+        "interpretation": "Second-level administrative subdivisions (districts, counties, departments, woredas depending on country). Each feature includes the admin2 name, GAUL admin2 code, and parent admin1 identifier. Finest spatial unit in this release; suitable for localised agricultural monitoring and early warning systems."
+      }
+    ],
+    "cdh:usecases": [
+      "Spatial aggregation of gridded climate and agroclimatic indicators by administrative unit for national reporting",
+      "Food security early warning — linking FEWS NET alerts and IPC classifications to subnational boundaries",
+      "Crop production and yield statistics by admin zone for agricultural planning",
+      "Zonal statistics for climate adaptation programme targeting at district level",
+      "Boundary harmonisation for multi-country datasets spanning the African continent"
+    ]
   },
   "links": [
     {
@@ -27,6 +62,12 @@
       "href": "https://www.fao.org/geonetwork/srv/en/metadata.show?id=12691",
       "title": "FAO GAUL — GeoNetwork record",
       "type": "text/html"
+    },
+    {
+      "rel": "extension",
+      "href": "https://github.com/cgiar-csi/stac-cdh-extension/blob/v1.0.0/schema.json",
+      "title": "CDH STAC Extension v1.0.0",
+      "type": "application/json"
     }
   ],
   "assets": {
