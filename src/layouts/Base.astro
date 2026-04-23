@@ -5,9 +5,11 @@ import { url } from '../lib/url';
 interface Props {
   title: string;
   description?: string;
+  jsonLd?: object | object[];
 }
 
-const { title, description = 'CGIAR Climate Data Hub' } = Astro.props;
+const { title, description = 'CGIAR Climate Data Hub', jsonLd } = Astro.props;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
 
 const navLinks = [
   { href: url('/catalog'), label: 'Catalog' },
@@ -27,7 +29,16 @@ const currentPath = Astro.url.pathname;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
     <title>{title} | CDH</title>
+    <!-- OpenGraph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="CGIAR Climate Data Hub" />
+    <meta property="og:title" content={`${title} | CDH`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <!-- schema.org JSON-LD -->
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(Array.isArray(jsonLd) ? jsonLd : [jsonLd])} />}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   </head>

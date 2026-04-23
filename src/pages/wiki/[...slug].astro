@@ -17,10 +17,20 @@ interface Props {
 
 const { entry } = Astro.props;
 const { Content } = await render(entry);
+
+const articleJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: entry.data.title,
+  description: entry.data.description,
+  keywords: entry.data.tags,
+  ...(entry.data.lastUpdated ? { dateModified: entry.data.lastUpdated.toISOString() } : {}),
+  publisher: { '@type': 'Organization', name: 'CGIAR', url: 'https://www.cgiar.org' },
+};
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
-<Base title={entry.data.title} description={entry.data.description}>
+<Base title={entry.data.title} description={entry.data.description} jsonLd={articleJsonLd}>
   <article data-pagefind-body>
     <nav class="breadcrumb" aria-label="Breadcrumb">
       <a href={url('/wiki')}>Wiki</a>

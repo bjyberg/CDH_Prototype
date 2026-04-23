@@ -45,9 +45,42 @@ const temporalResolution = properties['cdh:temporal_resolution'];
 const variableSummary    = properties['cdh:variable_summary'];
 const usecases           = properties['cdh:usecases'];
 const isCdhExtended      = stac_extensions?.some(e => e.includes('stac-cdh-extension')) ?? false;
+
+const licenseUrl = licenseInfo?.url;
+const datasetJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Dataset',
+  name: title,
+  description,
+  keywords,
+  ...(licenseUrl ? { license: licenseUrl } : {}),
+  ...(properties.start_datetime || properties.end_datetime ? {
+    temporalCoverage: `${properties.start_datetime ?? ''}/${properties.end_datetime ?? ''}`,
+  } : {}),
+  spatialCoverage: {
+    '@type': 'Place',
+    geo: {
+      '@type': 'GeoShape',
+      box: `${bbox[1]} ${bbox[0]} ${bbox[3]} ${bbox[2]}`,
+    },
+  },
+  creator: {
+    '@type': 'Organization',
+    name: 'CGIAR',
+    url: 'https://www.cgiar.org',
+  },
+  distribution: assetEntries
+    .filter(([, a]) => a.roles?.includes('data') ?? false)
+    .map(([, a]) => ({
+      '@type': 'DataDownload',
+      name: a.title,
+      contentUrl: a.href,
+      encodingFormat: a.type,
+    })),
+};
 ---
 
-<Base title={title} description={description}>
+<Base title={title} description={description} jsonLd={datasetJsonLd}>
   <div data-pagefind-body>
     <nav class="breadcrumb" aria-label="Breadcrumb">
       <a href={url('/catalog')}>Catalog</a>
