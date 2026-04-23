@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import { url } from '../../lib/url';
 
 const pages = await getCollection('wiki');
 pages.sort((a, b) => a.data.title.localeCompare(b.data.title));
@@ -16,7 +17,7 @@ pages.sort((a, b) => a.data.title.localeCompare(b.data.title));
   <ul class="content-list" role="list">
     {pages.map(page => (
       <li class="content-item">
-        <a href={`/wiki/${page.id}`}>
+        <a href={url(`/wiki/${page.id}`)}>
           <h2>{page.data.title}</h2>
         </a>
         <p>{page.data.description}</p>

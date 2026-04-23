@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import { url } from '../../lib/url';
 
 const all = await getCollection('tutorials', ({ data }) => !data.draft);
 const tutorials = all.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
@@ -16,7 +17,7 @@ const tutorials = all.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.v
   <ul class="content-list" role="list">
     {tutorials.map(t => (
       <li class="content-item">
-        <a href={`/tutorials/${t.id}`}>
+        <a href={url(`/tutorials/${t.id}`)}>
           <h2>{t.data.title}</h2>
         </a>
         <p>{t.data.description}</p>

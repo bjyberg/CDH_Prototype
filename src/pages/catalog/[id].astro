@@ -1,6 +1,7 @@
 ---
 import { getCollection, type CollectionEntry } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import { url } from '../../lib/url';
 
 export async function getStaticPaths() {
   const items = await getCollection('catalog');
@@ -49,7 +50,7 @@ const isCdhExtended      = stac_extensions?.some(e => e.includes('stac-cdh-exten
 <Base title={title} description={description}>
   <div data-pagefind-body>
     <nav class="breadcrumb" aria-label="Breadcrumb">
-      <a href="/catalog">Catalog</a>
+      <a href={url('/catalog')}>Catalog</a>
       <span class="breadcrumb-sep" aria-hidden="true">›</span>
       <span>{title}</span>
     </nav>
@@ -214,7 +215,9 @@ const isCdhExtended      = stac_extensions?.some(e => e.includes('stac-cdh-exten
           {derivedFrom.map(link => {
             const stacId = link.href.split('/').pop() ?? '';
             const slug = stacIdToSlug[stacId];
-            const resolvedHref = slug ? `/catalog/${slug}` : link.href;
+            const resolvedHref = slug
+              ? url(`/catalog/${slug}`)
+              : link.href.startsWith('/') ? url(link.href) : link.href;
             return (
               <li class="asset-item asset-item--derived">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">

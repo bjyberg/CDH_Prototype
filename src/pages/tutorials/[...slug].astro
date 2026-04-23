@@ -1,6 +1,7 @@
 ---
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import { url } from '../../lib/url';
 
 export async function getStaticPaths() {
   const tutorials = await getCollection('tutorials', ({ data }) => !data.draft);
@@ -22,7 +23,7 @@ const tocHeadings = headings.filter(h => h.depth <= 3);
 <Base title={entry.data.title} description={entry.data.description}>
   <article data-pagefind-body>
     <nav class="breadcrumb" aria-label="Breadcrumb">
-      <a href="/tutorials">Tutorials</a>
+      <a href={url('/tutorials')}>Tutorials</a>
       <span class="breadcrumb-sep" aria-hidden="true">›</span>
       <span>{entry.data.title}</span>
     </nav>

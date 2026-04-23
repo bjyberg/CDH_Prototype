@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import { getCollection } from 'astro:content';
+import { url } from '../lib/url';
 
 const catalogCount = (await getCollection('catalog')).length;
 const tutorialCount = (await getCollection('tutorials', ({ data }) => !data.draft)).length;
@@ -16,19 +17,19 @@ const wikiCount = (await getCollection('wiki')).length;
       and explore reference documentation built for agricultural researchers.
     </p>
     <div class="hero-actions">
-      <a href="/catalog" class="btn-primary">
+      <a href={url('/catalog')} class="btn-primary">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
           <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
         </svg>
         Browse Catalog
       </a>
-      <a href="/tutorials" class="btn-secondary">View Tutorials</a>
+      <a href={url('/tutorials')} class="btn-secondary">View Tutorials</a>
     </div>
   </section>
 
   <nav class="section-cards" aria-label="Site sections">
-    <a href="/catalog" class="section-card">
+    <a href={url('/catalog')} class="section-card">
       <div class="section-card-icon" aria-hidden="true">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
@@ -41,7 +42,7 @@ const wikiCount = (await getCollection('wiki')).length;
       <span class="section-card-arrow">Browse datasets →</span>
     </a>
 
-    <a href="/tutorials" class="section-card">
+    <a href={url('/tutorials')} class="section-card">
       <div class="section-card-icon" aria-hidden="true">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
@@ -54,7 +55,7 @@ const wikiCount = (await getCollection('wiki')).length;
       <span class="section-card-arrow">Start learning →</span>
     </a>
 
-    <a href="/wiki" class="section-card">
+    <a href={url('/wiki')} class="section-card">
       <div class="section-card-icon" aria-hidden="true">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
