@@ -1,135 +1,152 @@
 {
-  "type": "Feature",
-  "stac_version": "1.0.0",
-  "license": "CC-BY-4.0",
-  "stac_extensions": [
-    "https://github.com/cgiar-csi/stac-cdh-extension/blob/v1.0.0/schema.json"
-  ],
-  "id": "ea-agroclimatic-index-v1",
-  "title": "East Africa Growing Season Agroclimatic Index v1.0",
-  "description": "A derived agroclimatic suitability dataset for East Africa, combining CHIRPS daily rainfall and ERA5 monthly temperature to characterise growing season conditions for key smallholder commodities. Covers Kenya, Tanzania, Uganda, Ethiopia, Rwanda, Burundi, Somalia, Mozambique, and Zambia at 0.25° resolution for 1981–2023.",
-  "keywords": ["east africa", "agroclimatic", "growing season", "derived", "suitability", "smallholder", "CDH-extension"],
-  "bbox": [28.0, -12.0, 52.0, 18.0],
-  "geometry": {
-    "type": "Polygon",
-    "coordinates": [[[28.0, -12.0], [52.0, -12.0], [52.0, 18.0], [28.0, 18.0], [28.0, -12.0]]]
-  },
-  "properties": {
-    "datetime": null,
-    "start_datetime": "1981-01-01",
-    "end_datetime": "2023-12-31",
-    "cdh:spatial_resolution": {
-      "value": 0.25,
-      "unit": "degrees",
-      "description": "~28 km at the equator — inherited from the coarser ERA5 input grid"
-    },
-    "cdh:temporal_resolution": {
-      "value": 1,
-      "unit": "year",
-      "description": "Annual composites; derived from daily CHIRPS and monthly ERA5 inputs"
-    },
-    "cdh:commodities": ["maize", "sorghum", "beans", "millet", "soybean", "cassava"],
-    "cdh:variable_summary": [
-      {
-        "name": "gsl",
-        "definition": "Growing Season Length",
-        "unit": "days yr⁻¹",
-        "interpretation": "Number of days per year meeting minimum temperature (≥10 °C) and moisture (P/PET ≥ 0.35) thresholds simultaneously. Values above 120 days indicate viable rainfed agriculture; values below 60 days suggest high drought risk."
-      },
-      {
-        "name": "water_deficit",
-        "definition": "Seasonal Crop Water Deficit",
-        "unit": "mm season⁻¹",
-        "interpretation": "Accumulated difference between potential evapotranspiration (derived from ERA5 T₂ₘ) and CHIRPS rainfall during the growing window. Higher values indicate greater supplemental irrigation demand. Deficits > 200 mm season⁻¹ are associated with yield losses > 30 % for maize."
-      },
-      {
-        "name": "heat_stress_index",
-        "definition": "Crop Heat Stress Index",
-        "unit": "dimensionless [0–1]",
-        "interpretation": "Fraction of growing season days on which the daily maximum temperature exceeds the crop-specific critical threshold (34 °C for maize, 35 °C for sorghum). Values > 0.3 indicate significant yield risk; values > 0.5 indicate severe stress warranting variety substitution or shifted planting dates."
-      },
-      {
-        "name": "onset_doy",
-        "definition": "Onset Day of Year",
-        "unit": "day of year",
-        "interpretation": "First day of the year satisfying season-onset criteria (≥25 mm in 3 days, no dry spell > 10 days in following 30 days). Earlier onset (low doy) generally improves yields but can also indicate false starts. Expressed as a long-term mean ± interannual standard deviation."
-      }
-    ],
-    "cdh:usecases": [
-      "Crop suitability mapping and agro-ecological zone delineation for national agricultural planning",
-      "Climate adaptation strategy development for smallholder farmer programmes",
-      "Food security early warning — integration with FEWS NET alert systems",
-      "Planting date optimisation and seasonal calendar adjustment under climate variability",
-      "Index-based agricultural insurance product design (trigger threshold calibration)"
-    ]
-  },
-  "links": [
-    {
-      "rel": "self",
-      "href": "/catalog/ea-agroclimatic-index-v1",
-      "type": "application/geo+json"
-    },
-    {
-      "rel": "derived_from",
-      "href": "/catalog/chirps-v2-daily",
-      "title": "CHIRPS Daily Rainfall v2.0",
-      "type": "application/geo+json"
-    },
-    {
-      "rel": "derived_from",
-      "href": "/catalog/era5-2m-temperature-monthly",
-      "title": "ERA5 Monthly 2m Air Temperature",
-      "type": "application/geo+json"
-    },
-    {
-      "rel": "derived_from",
-      "href": "/catalog/gaul-2024-africa",
-      "title": "GAUL 2024 Administrative Boundaries — Africa",
-      "type": "application/geo+json"
-    },
-    {
-      "rel": "code",
-      "href": "https://github.com/cgiar-csi/ea-agroclimatic-index",
-      "title": "Processing code — GitHub (cgiar-csi/ea-agroclimatic-index)",
-      "type": "text/html"
-    },
-    {
-      "rel": "extension",
-      "href": "https://github.com/cgiar-csi/stac-cdh-extension/blob/v1.0.0/schema.json",
-      "title": "CDH STAC Extension v1.0.0",
-      "type": "application/json"
-    }
-  ],
-  "assets": {
-    "gsl": {
-      "href": "https://data.cdh.cgiar.org/ea-agroclimatic-index-v1/gsl_mean_1981-2023.tif",
-      "title": "Growing Season Length — long-term mean (COG)",
-      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
-      "roles": ["data"]
-    },
-    "water_deficit": {
-      "href": "https://data.cdh.cgiar.org/ea-agroclimatic-index-v1/water_deficit_mean_1981-2023.tif",
-      "title": "Seasonal Water Deficit — long-term mean (COG)",
-      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
-      "roles": ["data"]
-    },
-    "heat_stress": {
-      "href": "https://data.cdh.cgiar.org/ea-agroclimatic-index-v1/heat_stress_index_mean_1981-2023.tif",
-      "title": "Heat Stress Index — long-term mean (COG)",
-      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
-      "roles": ["data"]
-    },
-    "timeseries_csv": {
-      "href": "https://data.cdh.cgiar.org/ea-agroclimatic-index-v1/ea_agroclimatic_timeseries.csv",
-      "title": "Annual variable time series by country (CSV)",
-      "type": "text/csv",
-      "roles": ["data"]
-    },
-    "thumbnail": {
-      "href": "https://data.cdh.cgiar.org/ea-agroclimatic-index-v1/thumbnail.png",
-      "title": "Overview map thumbnail",
-      "type": "image/png",
-      "roles": ["thumbnail", "overview"]
-    }
-  }
+	"type": "Feature",
+	"stac_version": "1.0.0",
+	"license": "CC-BY-4.0",
+	"stac_extensions": [
+		"https://github.com/cgiar-csi/stac-cdh-extension/blob/v1.0.0/schema.json"
+	],
+	"id": "ea-agroclimatic-index-v1",
+	"title": "East Africa Growing Season Agroclimatic Index v1.0",
+	"description": "A derived agroclimatic suitability dataset for East Africa, combining CHIRPS daily rainfall and ERA5 monthly temperature to characterise growing season conditions for key smallholder commodities. Covers Kenya, Tanzania, Uganda, Ethiopia, Rwanda, Burundi, Somalia, Mozambique, and Zambia at 0.25° resolution for 1981–2023.",
+	"keywords": [
+		"east africa",
+		"agroclimatic",
+		"growing season",
+		"derived",
+		"suitability",
+		"smallholder",
+		"CDH-extension"
+	],
+	"bbox": [28.0, -12.0, 52.0, 18.0],
+	"geometry": {
+		"type": "Polygon",
+		"coordinates": [
+			[[28.0, -12.0], [52.0, -12.0], [52.0, 18.0], [28.0, 18.0], [28.0, -12.0]]
+		]
+	},
+	"properties": {
+		"datetime": null,
+		"start_datetime": "1981-01-01",
+		"end_datetime": "2023-12-31",
+		"cdh:spatial_resolution": {
+			"value": 0.25,
+			"unit": "degrees",
+			"description": "~28 km at the equator — inherited from the coarser ERA5 input grid"
+		},
+		"cdh:temporal_resolution": {
+			"value": 1,
+			"unit": "year",
+			"description": "Annual composites; derived from daily CHIRPS and monthly ERA5 inputs"
+		},
+		"cdh:commodities": [
+			"maize",
+			"sorghum",
+			"beans",
+			"millet",
+			"soybean",
+			"cassava"
+		],
+		"cdh:variable_summary": [
+			{
+				"name": "gsl",
+				"definition": "Growing Season Length",
+				"unit": "days yr⁻¹",
+				"interpretation": "Number of days per year meeting minimum temperature (≥10 °C) and moisture (P/PET ≥ 0.35) thresholds simultaneously. Values above 120 days indicate viable rainfed agriculture; values below 60 days suggest high drought risk."
+			},
+			{
+				"name": "water_deficit",
+				"definition": "Seasonal Crop Water Deficit",
+				"unit": "mm season⁻¹",
+				"interpretation": "Accumulated difference between potential evapotranspiration (derived from ERA5 T₂ₘ) and CHIRPS rainfall during the growing window. Higher values indicate greater supplemental irrigation demand. Deficits > 200 mm season⁻¹ are associated with yield losses > 30 % for maize."
+			},
+			{
+				"name": "heat_stress_index",
+				"definition": "Crop Heat Stress Index",
+				"unit": "dimensionless [0–1]",
+				"interpretation": "Fraction of growing season days on which the daily maximum temperature exceeds the crop-specific critical threshold (34 °C for maize, 35 °C for sorghum). Values > 0.3 indicate significant yield risk; values > 0.5 indicate severe stress warranting variety substitution or shifted planting dates."
+			},
+			{
+				"name": "onset_doy",
+				"definition": "Onset Day of Year",
+				"unit": "day of year",
+				"interpretation": "First day of the year satisfying season-onset criteria (≥25 mm in 3 days, no dry spell > 10 days in following 30 days). Earlier onset (low doy) generally improves yields but can also indicate false starts. Expressed as a long-term mean ± interannual standard deviation."
+			}
+		],
+		"cdh:usecases": [
+			"Crop suitability mapping and agro-ecological zone delineation for national agricultural planning",
+			"Climate adaptation strategy development for smallholder farmer programmes",
+			"Food security early warning — integration with FEWS NET alert systems",
+			"Planting date optimisation and seasonal calendar adjustment under climate variability",
+			"Index-based agricultural insurance product design (trigger threshold calibration)"
+		]
+	},
+	"links": [
+		{
+			"rel": "self",
+			"href": "/catalog/ea-agroclimatic-index-v1",
+			"type": "application/geo+json"
+		},
+		{
+			"rel": "derived_from",
+			"href": "/catalog/chirps-v2-daily",
+			"title": "CHIRPS Daily Rainfall v2.0",
+			"type": "application/geo+json"
+		},
+		{
+			"rel": "derived_from",
+			"href": "/catalog/era5-2m-temperature-monthly",
+			"title": "ERA5 Monthly 2m Air Temperature",
+			"type": "application/geo+json"
+		},
+		{
+			"rel": "derived_from",
+			"href": "/catalog/gaul-2024-africa",
+			"title": "GAUL 2024 Administrative Boundaries — Africa",
+			"type": "application/geo+json"
+		},
+		{
+			"rel": "code",
+			"href": "https://github.com/cgiar-csi/ea-agroclimatic-index",
+			"title": "Processing code — GitHub (cgiar-csi/ea-agroclimatic-index)",
+			"type": "text/html"
+		},
+		{
+			"rel": "extension",
+			"href": "https://github.com/cgiar-csi/stac-cdh-extension/blob/v1.0.0/schema.json",
+			"title": "CDH STAC Extension v1.0.0",
+			"type": "application/json"
+		}
+	],
+	"assets": {
+		"gsl": {
+			"href": "https://data.cdh.cgiar.org/ea-agroclimatic-index-v1/gsl_mean_1981-2023.tif",
+			"title": "Growing Season Length — long-term mean (COG)",
+			"type": "image/tiff; application=geotiff; profile=cloud-optimized",
+			"roles": ["data"]
+		},
+		"water_deficit": {
+			"href": "https://data.cdh.cgiar.org/ea-agroclimatic-index-v1/water_deficit_mean_1981-2023.tif",
+			"title": "Seasonal Water Deficit — long-term mean (COG)",
+			"type": "image/tiff; application=geotiff; profile=cloud-optimized",
+			"roles": ["data"]
+		},
+		"heat_stress": {
+			"href": "https://data.cdh.cgiar.org/ea-agroclimatic-index-v1/heat_stress_index_mean_1981-2023.tif",
+			"title": "Heat Stress Index — long-term mean (COG)",
+			"type": "image/tiff; application=geotiff; profile=cloud-optimized",
+			"roles": ["data"]
+		},
+		"timeseries_csv": {
+			"href": "https://data.cdh.cgiar.org/ea-agroclimatic-index-v1/ea_agroclimatic_timeseries.csv",
+			"title": "Annual variable time series by country (CSV)",
+			"type": "text/csv",
+			"roles": ["data"]
+		},
+		"thumbnail": {
+			"href": "https://data.cdh.cgiar.org/ea-agroclimatic-index-v1/thumbnail.png",
+			"title": "Overview map thumbnail",
+			"type": "image/png",
+			"roles": ["thumbnail", "overview"]
+		}
+	}
 }

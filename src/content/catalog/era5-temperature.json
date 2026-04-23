@@ -1,45 +1,54 @@
 {
-  "type": "Feature",
-  "stac_version": "1.0.0",
-  "id": "era5-2m-temperature-monthly",
-  "license": "proprietary",
-  "title": "ERA5 Monthly 2m Air Temperature",
-  "description": "ECMWF ERA5 reanalysis monthly means of 2-metre air temperature at 0.25° resolution, covering the full globe from 1940 to near-present. Part of the Copernicus Climate Change Service (C3S) dataset portfolio.",
-  "keywords": ["temperature", "ERA5", "reanalysis", "ECMWF", "monthly", "Copernicus"],
-  "bbox": [-180, -90, 180, 90],
-  "geometry": {
-    "type": "Polygon",
-    "coordinates": [[[-180, -90], [180, -90], [180, 90], [-180, 90], [-180, -90]]]
-  },
-  "properties": {
-    "datetime": null,
-    "start_datetime": "1940-01-01",
-    "end_datetime": "2024-06-30"
-  },
-  "links": [
-    {
-      "rel": "self",
-      "href": "/catalog/era5-2m-temperature-monthly",
-      "type": "application/json"
-    },
-    {
-      "rel": "source",
-      "href": "https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels-monthly-means",
-      "title": "Copernicus Climate Data Store"
-    }
-  ],
-  "assets": {
-    "data": {
-      "href": "https://cds.climate.copernicus.eu/api/retrieve",
-      "title": "Access via CDS API",
-      "type": "application/x-api",
-      "roles": ["data"]
-    },
-    "documentation": {
-      "href": "https://confluence.ecmwf.int/display/CKB/ERA5",
-      "title": "ERA5 Documentation",
-      "type": "text/html",
-      "roles": ["metadata"]
-    }
-  }
+	"type": "Feature",
+	"stac_version": "1.0.0",
+	"id": "era5-2m-temperature-monthly",
+	"license": "proprietary",
+	"title": "ERA5 Monthly 2m Air Temperature",
+	"description": "ECMWF ERA5 reanalysis monthly means of 2-metre air temperature at 0.25° resolution, covering the full globe from 1940 to near-present. Part of the Copernicus Climate Change Service (C3S) dataset portfolio.",
+	"keywords": [
+		"temperature",
+		"ERA5",
+		"reanalysis",
+		"ECMWF",
+		"monthly",
+		"Copernicus"
+	],
+	"bbox": [-180, -90, 180, 90],
+	"geometry": {
+		"type": "Polygon",
+		"coordinates": [
+			[[-180, -90], [180, -90], [180, 90], [-180, 90], [-180, -90]]
+		]
+	},
+	"properties": {
+		"datetime": null,
+		"start_datetime": "1940-01-01",
+		"end_datetime": "2024-06-30"
+	},
+	"links": [
+		{
+			"rel": "self",
+			"href": "/catalog/era5-2m-temperature-monthly",
+			"type": "application/json"
+		},
+		{
+			"rel": "source",
+			"href": "https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels-monthly-means",
+			"title": "Copernicus Climate Data Store"
+		}
+	],
+	"assets": {
+		"data": {
+			"href": "https://cds.climate.copernicus.eu/api/retrieve",
+			"title": "Access via CDS API",
+			"type": "application/x-api",
+			"roles": ["data"]
+		},
+		"documentation": {
+			"href": "https://confluence.ecmwf.int/display/CKB/ERA5",
+			"title": "ERA5 Documentation",
+			"type": "text/html",
+			"roles": ["metadata"]
+		}
+	}
 }

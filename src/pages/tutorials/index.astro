@@ -1,10 +1,12 @@
 ---
-import { getCollection } from 'astro:content';
-import Base from '../../layouts/Base.astro';
-import { url } from '../../lib/url';
+import { getCollection } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import { url } from "../../lib/url";
 
-const all = await getCollection('tutorials', ({ data }) => !data.draft);
-const tutorials = all.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const all = await getCollection("tutorials", ({ data }) => !data.draft);
+const tutorials = all.sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
 ---
 
 <Base title="Tutorials" description="Step-by-step guides for working with CGIAR climate data.">

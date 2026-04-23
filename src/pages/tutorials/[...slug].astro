@@ -1,32 +1,36 @@
 ---
-import { getCollection, render, type CollectionEntry } from 'astro:content';
-import Base from '../../layouts/Base.astro';
-import { url } from '../../lib/url';
+import { getCollection, render, type CollectionEntry } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import { url } from "../../lib/url";
 
 export async function getStaticPaths() {
-  const tutorials = await getCollection('tutorials', ({ data }) => !data.draft);
-  return tutorials.map(entry => ({
-    params: { slug: entry.id },
-    props: { entry },
-  }));
+	const tutorials = await getCollection("tutorials", ({ data }) => !data.draft);
+	return tutorials.map((entry) => ({
+		params: { slug: entry.id },
+		props: { entry },
+	}));
 }
 
 interface Props {
-  entry: CollectionEntry<'tutorials'>;
+	entry: CollectionEntry<"tutorials">;
 }
 
 const { entry } = Astro.props;
 const { Content, headings } = await render(entry);
-const tocHeadings = headings.filter(h => h.depth <= 3);
+const tocHeadings = headings.filter((h) => h.depth <= 3);
 
 const articleJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'TechArticle',
-  headline: entry.data.title,
-  description: entry.data.description,
-  keywords: entry.data.tags,
-  datePublished: entry.data.pubDate.toISOString(),
-  publisher: { '@type': 'Organization', name: 'CGIAR', url: 'https://www.cgiar.org' },
+	"@context": "https://schema.org",
+	"@type": "TechArticle",
+	headline: entry.data.title,
+	description: entry.data.description,
+	keywords: entry.data.tags,
+	datePublished: entry.data.pubDate.toISOString(),
+	publisher: {
+		"@type": "Organization",
+		name: "CGIAR",
+		url: "https://www.cgiar.org",
+	},
 };
 ---
 

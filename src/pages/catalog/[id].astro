@@ -1,82 +1,109 @@
 ---
-import { getCollection, type CollectionEntry } from 'astro:content';
-import Base from '../../layouts/Base.astro';
-import { url } from '../../lib/url';
+import { getCollection, type CollectionEntry } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import { url } from "../../lib/url";
 
 export async function getStaticPaths() {
-  const items = await getCollection('catalog');
-  return items.map(item => ({
-    params: { id: item.id },
-    props: { item, allItems: items },
-  }));
+	const items = await getCollection("catalog");
+	return items.map((item) => ({
+		params: { id: item.id },
+		props: { item, allItems: items },
+	}));
 }
 
 interface Props {
-  item: CollectionEntry<'catalog'>;
-  allItems: CollectionEntry<'catalog'>[];
+	item: CollectionEntry<"catalog">;
+	allItems: CollectionEntry<"catalog">[];
 }
 
 const { item, allItems } = Astro.props;
 
 // Map STAC id → Astro file slug for resolving derived_from hrefs
-const stacIdToSlug = Object.fromEntries(
-  allItems.map(i => [i.data.id, i.id])
-);
-const { title, description, keywords, bbox, properties, assets, links, stac_extensions, license } = item.data;
+const stacIdToSlug = Object.fromEntries(allItems.map((i) => [i.data.id, i.id]));
+const {
+	title,
+	description,
+	keywords,
+	bbox,
+	properties,
+	assets,
+	links,
+	stac_extensions,
+	license,
+} = item.data;
 
 const licenseDisplay: Record<string, { label: string; url?: string }> = {
-  'CC0-1.0':       { label: 'CC0 1.0 Public Domain', url: 'https://creativecommons.org/publicdomain/zero/1.0/' },
-  'CC-BY-4.0':     { label: 'CC BY 4.0', url: 'https://creativecommons.org/licenses/by/4.0/' },
-  'CC-BY-SA-4.0':  { label: 'CC BY-SA 4.0', url: 'https://creativecommons.org/licenses/by-sa/4.0/' },
-  'CC-BY-NC-4.0':  { label: 'CC BY-NC 4.0', url: 'https://creativecommons.org/licenses/by-nc/4.0/' },
-  'proprietary':   { label: 'Proprietary' },
-  'various':       { label: 'Various' },
+	"CC0-1.0": {
+		label: "CC0 1.0 Public Domain",
+		url: "https://creativecommons.org/publicdomain/zero/1.0/",
+	},
+	"CC-BY-4.0": {
+		label: "CC BY 4.0",
+		url: "https://creativecommons.org/licenses/by/4.0/",
+	},
+	"CC-BY-SA-4.0": {
+		label: "CC BY-SA 4.0",
+		url: "https://creativecommons.org/licenses/by-sa/4.0/",
+	},
+	"CC-BY-NC-4.0": {
+		label: "CC BY-NC 4.0",
+		url: "https://creativecommons.org/licenses/by-nc/4.0/",
+	},
+	proprietary: { label: "Proprietary" },
+	various: { label: "Various" },
 };
-const licenseInfo = license ? (licenseDisplay[license] ?? { label: license }) : null;
+const licenseInfo = license
+	? (licenseDisplay[license] ?? { label: license })
+	: null;
 
 const assetEntries = Object.entries(assets ?? {});
-const derivedFrom = (links ?? []).filter(l => l.rel === 'derived_from');
-const codeLinks   = (links ?? []).filter(l => l.rel === 'code');
-const otherLinks  = (links ?? []).filter(l => !['self', 'derived_from', 'code', 'extension'].includes(l.rel));
+const derivedFrom = (links ?? []).filter((l) => l.rel === "derived_from");
+const codeLinks = (links ?? []).filter((l) => l.rel === "code");
+const otherLinks = (links ?? []).filter(
+	(l) => !["self", "derived_from", "code", "extension"].includes(l.rel),
+);
 
-const commodities        = properties['cdh:commodities'];
-const spatialResolution  = properties['cdh:spatial_resolution'];
-const temporalResolution = properties['cdh:temporal_resolution'];
-const variableSummary    = properties['cdh:variable_summary'];
-const usecases           = properties['cdh:usecases'];
-const isCdhExtended      = stac_extensions?.some(e => e.includes('stac-cdh-extension')) ?? false;
+const commodities = properties["cdh:commodities"];
+const spatialResolution = properties["cdh:spatial_resolution"];
+const temporalResolution = properties["cdh:temporal_resolution"];
+const variableSummary = properties["cdh:variable_summary"];
+const usecases = properties["cdh:usecases"];
+const isCdhExtended =
+	stac_extensions?.some((e) => e.includes("stac-cdh-extension")) ?? false;
 
 const licenseUrl = licenseInfo?.url;
 const datasetJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'Dataset',
-  name: title,
-  description,
-  keywords,
-  ...(licenseUrl ? { license: licenseUrl } : {}),
-  ...(properties.start_datetime || properties.end_datetime ? {
-    temporalCoverage: `${properties.start_datetime ?? ''}/${properties.end_datetime ?? ''}`,
-  } : {}),
-  spatialCoverage: {
-    '@type': 'Place',
-    geo: {
-      '@type': 'GeoShape',
-      box: `${bbox[1]} ${bbox[0]} ${bbox[3]} ${bbox[2]}`,
-    },
-  },
-  creator: {
-    '@type': 'Organization',
-    name: 'CGIAR',
-    url: 'https://www.cgiar.org',
-  },
-  distribution: assetEntries
-    .filter(([, a]) => a.roles?.includes('data') ?? false)
-    .map(([, a]) => ({
-      '@type': 'DataDownload',
-      name: a.title,
-      contentUrl: a.href,
-      encodingFormat: a.type,
-    })),
+	"@context": "https://schema.org",
+	"@type": "Dataset",
+	name: title,
+	description,
+	keywords,
+	...(licenseUrl ? { license: licenseUrl } : {}),
+	...(properties.start_datetime || properties.end_datetime
+		? {
+				temporalCoverage: `${properties.start_datetime ?? ""}/${properties.end_datetime ?? ""}`,
+			}
+		: {}),
+	spatialCoverage: {
+		"@type": "Place",
+		geo: {
+			"@type": "GeoShape",
+			box: `${bbox[1]} ${bbox[0]} ${bbox[3]} ${bbox[2]}`,
+		},
+	},
+	creator: {
+		"@type": "Organization",
+		name: "CGIAR",
+		url: "https://www.cgiar.org",
+	},
+	distribution: assetEntries
+		.filter(([, a]) => a.roles?.includes("data") ?? false)
+		.map(([, a]) => ({
+			"@type": "DataDownload",
+			name: a.title,
+			contentUrl: a.href,
+			encodingFormat: a.type,
+		})),
 };
 ---
 

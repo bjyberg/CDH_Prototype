@@ -1,10 +1,10 @@
 ---
-import { getCollection } from 'astro:content';
-import Base from '../../layouts/Base.astro';
-import 'leaflet/dist/leaflet.css';
-import { url } from '../../lib/url';
+import { getCollection } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import "leaflet/dist/leaflet.css";
+import { url } from "../../lib/url";
 
-const items = await getCollection('catalog');
+const items = await getCollection("catalog");
 items.sort((a, b) => a.data.title.localeCompare(b.data.title));
 ---
 

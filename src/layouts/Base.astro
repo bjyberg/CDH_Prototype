@@ -1,20 +1,20 @@
 ---
-import '../styles/global.css';
-import { url } from '../lib/url';
+import "../styles/global.css";
+import { url } from "../lib/url";
 
 interface Props {
-  title: string;
-  description?: string;
-  jsonLd?: object | object[];
+	title: string;
+	description?: string;
+	jsonLd?: object | object[];
 }
 
-const { title, description = 'CGIAR Climate Data Hub', jsonLd } = Astro.props;
+const { title, description = "CGIAR Climate Data Hub", jsonLd } = Astro.props;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
 
 const navLinks = [
-  { href: url('/catalog'), label: 'Catalog' },
-  { href: url('/tutorials'), label: 'Tutorials' },
-  { href: url('/wiki'), label: 'Wiki' },
+	{ href: url("/catalog"), label: "Catalog" },
+	{ href: url("/tutorials"), label: "Tutorials" },
+	{ href: url("/wiki"), label: "Wiki" },
 ];
 
 const currentPath = Astro.url.pathname;

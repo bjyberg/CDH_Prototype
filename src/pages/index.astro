@@ -1,11 +1,13 @@
 ---
-import Base from '../layouts/Base.astro';
-import { getCollection } from 'astro:content';
-import { url } from '../lib/url';
+import Base from "../layouts/Base.astro";
+import { getCollection } from "astro:content";
+import { url } from "../lib/url";
 
-const catalogCount = (await getCollection('catalog')).length;
-const tutorialCount = (await getCollection('tutorials', ({ data }) => !data.draft)).length;
-const wikiCount = (await getCollection('wiki')).length;
+const catalogCount = (await getCollection("catalog")).length;
+const tutorialCount = (
+	await getCollection("tutorials", ({ data }) => !data.draft)
+).length;
+const wikiCount = (await getCollection("wiki")).length;
 ---
 
 <Base title="Home" description="CGIAR Climate Data Hub — access climate datasets, tutorials, and documentation.">
