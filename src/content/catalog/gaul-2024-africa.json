@@ -1,0 +1,58 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "id": "gaul-2024-africa",
+  "license": "proprietary",
+  "title": "GAUL 2024 Administrative Boundaries — Africa",
+  "description": "FAO Global Administrative Unit Layers (GAUL) 2024 edition for Africa, providing polygon boundaries at admin levels 0 (country), 1 (province/state), and 2 (district/county). Distributed as GeoParquet files per administrative level. Covers all 54 African Union member states.",
+  "keywords": ["administrative boundaries", "GAUL", "Africa", "vector", "FAO", "admin0", "admin1", "admin2", "GeoParquet"],
+  "bbox": [-18.0, -35.0, 52.0, 38.0],
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [[[-18.0, -35.0], [52.0, -35.0], [52.0, 38.0], [-18.0, 38.0], [-18.0, -35.0]]]
+  },
+  "properties": {
+    "datetime": null,
+    "start_datetime": "2024-01-01",
+    "end_datetime": "2024-12-31"
+  },
+  "links": [
+    {
+      "rel": "self",
+      "href": "/catalog/gaul-2024-africa",
+      "type": "application/geo+json"
+    },
+    {
+      "rel": "source",
+      "href": "https://www.fao.org/geonetwork/srv/en/metadata.show?id=12691",
+      "title": "FAO GAUL — GeoNetwork record",
+      "type": "text/html"
+    }
+  ],
+  "assets": {
+    "admin0": {
+      "href": "https://data.cdh.cgiar.org/gaul-2024-africa/Africa_Admin0_2024.parquet",
+      "title": "Admin level 0 — Country boundaries (GeoParquet)",
+      "type": "application/vnd.apache.parquet",
+      "roles": ["data"]
+    },
+    "admin1": {
+      "href": "https://data.cdh.cgiar.org/gaul-2024-africa/Africa_Admin1_2024.parquet",
+      "title": "Admin level 1 — Province / state boundaries (GeoParquet)",
+      "type": "application/vnd.apache.parquet",
+      "roles": ["data"]
+    },
+    "admin2": {
+      "href": "https://data.cdh.cgiar.org/gaul-2024-africa/Africa_Admin2_2024.parquet",
+      "title": "Admin level 2 — District / county boundaries (GeoParquet)",
+      "type": "application/vnd.apache.parquet",
+      "roles": ["data"]
+    },
+    "thumbnail": {
+      "href": "https://data.cdh.cgiar.org/gaul-2024-africa/thumbnail.png",
+      "title": "Overview map thumbnail",
+      "type": "image/png",
+      "roles": ["thumbnail", "overview"]
+    }
+  }
+}

@@ -7,7 +7,8 @@
 - [Data Catalog](/catalog): Browse all STAC datasets. Supports keyword and spatial bounding-box filtering.
 - [CHIRPS Daily Rainfall v2.0](/catalog/chirps-rainfall): Daily rainfall estimates at 0.05° resolution, 1981–present, 50°S–50°N. Combines satellite infrared data with station measurements.
 - [ERA5 Monthly 2m Air Temperature](/catalog/era5-temperature): ECMWF ERA5 reanalysis monthly temperature at 0.25° resolution, global, 1940–present.
-- [East Africa Growing Season Agroclimatic Index v1.0](/catalog/ea-agroclimatic-index): Derived agroclimatic suitability dataset for East Africa combining CHIRPS and ERA5. Covers growing season length, water deficit, heat stress, and season onset for key smallholder commodities (maize, sorghum, beans, millet, soybean, cassava), 1981–2023.
+- [East Africa Growing Season Agroclimatic Index v1.0](/catalog/ea-agroclimatic-index): Derived agroclimatic suitability dataset for East Africa combining CHIRPS, ERA5, and GAUL 2024 boundaries. Covers growing season length, water deficit, heat stress, and season onset for key smallholder commodities (maize, sorghum, beans, millet, soybean, cassava), 1981–2023.
+- [GAUL 2024 Administrative Boundaries — Africa](/catalog/gaul-2024-africa): FAO Global Administrative Unit Layers 2024 for Africa, admin levels 0–2 as GeoParquet files. Covers all 54 African Union member states.
 
 ## Tutorials
 

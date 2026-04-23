@@ -82,6 +82,12 @@
       "type": "application/geo+json"
     },
     {
+      "rel": "derived_from",
+      "href": "/catalog/gaul-2024-africa",
+      "title": "GAUL 2024 Administrative Boundaries — Africa",
+      "type": "application/geo+json"
+    },
+    {
       "rel": "code",
       "href": "https://github.com/cgiar-csi/ea-agroclimatic-index",
       "title": "Processing code — GitHub (cgiar-csi/ea-agroclimatic-index)",
